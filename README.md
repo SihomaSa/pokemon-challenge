@@ -908,7 +908,6 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 ## 🙏 Agradecimientos
 
 - **[PokéAPI](https://pokeapi.co)** - Por la increíble API de Pokémon
-- **[Anthropic](https://anthropic.com)** - Por el soporte técnico
 - **React Community** - Por las mejores prácticas
 - **AWS** - Por la infraestructura cloud
 
