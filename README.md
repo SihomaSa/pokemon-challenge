@@ -23,12 +23,12 @@
 <div align="center">
 
 ### Vista Principal - Explorador de Pokémon
-![Vista Principal](https://via.placeholder.com/800x500/F9FAFB/1A1A2E?text=Vista+Principal+-+Grid+de+Pokemon)
 <img width="1926" height="4652" alt="pokemon-frontend-sihomara s3-website us-east-2 amazonaws com_ (1)" src="https://github.com/user-attachments/assets/1f9b4e57-82b6-4e4b-9cbe-04be919354eb" />
 
 
 ### Sistema de Favoritos
-![Favoritos](https://via.placeholder.com/800x500/F9FAFB/FF3B3B?text=Sistema+de+Favoritos)
+<img width="986" height="554" alt="Captura de pantalla 2026-01-28 093827" src="https://github.com/user-attachments/assets/d3b22ae8-0583-4bf4-9d2f-0a2c63eae8d5" />
+
 
 ### Búsqueda y Filtros
 ![Búsqueda](https://via.placeholder.com/800x500/F9FAFB/4A90E2?text=Búsqueda+Inteligente)
