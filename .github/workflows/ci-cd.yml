@@ -6,118 +6,149 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  NODE_VERSION: 18
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
+  # =========================
   # Job 1: Test Backend
+  # =========================
   test-backend:
-    name: Test Backend
+    name: 🧪 Test Backend
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 10
+
+    strategy:
+      matrix:
+        node-version: [16, 18]
+
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout repository
         uses: actions/checkout@v3
-      
-      - name: Setup Node.js
+
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: ${{ matrix.node-version }}
+          cache: npm
           cache-dependency-path: backend/package-lock.json
-      
-      - name: Install dependencies
+
+      - name: 📦 Install backend dependencies
         working-directory: ./backend
         run: npm ci
-      
-      - name: Run tests
+        continue-on-error: false
+
+      - name: 🧪 Run backend tests
         working-directory: ./backend
         run: npm test
         env:
           NODE_ENV: test
-      
-      - name: Upload test coverage
-        uses: actions/upload-artifact@v3
+        continue-on-error: false
+
+      - name: 📊 Upload backend coverage
         if: always()
+        uses: actions/upload-artifact@v3
         with:
           name: backend-coverage
           path: backend/coverage
 
+  # =========================
   # Job 2: Test Frontend
+  # =========================
   test-frontend:
-    name: Test Frontend
+    name: 🧪 Test Frontend
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 10
+
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout repository
         uses: actions/checkout@v3
-      
-      - name: Setup Node.js
+
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
           cache-dependency-path: frontend/package-lock.json
-      
-      - name: Install dependencies
+
+      - name: 📦 Install frontend dependencies
         working-directory: ./frontend
         run: npm ci
-      
-      - name: Run tests
+        continue-on-error: false
+
+      - name: 🧪 Run frontend tests
         working-directory: ./frontend
         run: npm test -- --coverage --watchAll=false
         env:
           CI: true
-      
-      - name: Upload test coverage
-        uses: actions/upload-artifact@v3
+        continue-on-error: false
+
+      - name: 📊 Upload frontend coverage
         if: always()
+        uses: actions/upload-artifact@v3
         with:
           name: frontend-coverage
           path: frontend/coverage
 
+  # =========================
   # Job 3: Build Frontend
+  # =========================
   build-frontend:
-    name: Build Frontend
+    name: 🏗️ Build Frontend
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: test-frontend
-    
+
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout repository
         uses: actions/checkout@v3
-      
-      - name: Setup Node.js
+
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
           cache-dependency-path: frontend/package-lock.json
-      
-      - name: Install dependencies
+
+      - name: 🔍 Check REACT_APP_API_URL
+        run: |
+          if [ -z "${{ secrets.REACT_APP_API_URL }}" ]; then
+            echo "❌ Missing REACT_APP_API_URL secret"
+            exit 1
+          fi
+
+      - name: 📦 Install dependencies
         working-directory: ./frontend
         run: npm ci
-      
-      - name: Build
+
+      - name: 🏗️ Build frontend
         working-directory: ./frontend
         run: npm run build
         env:
           REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
-      
-      - name: Upload build artifacts
+
+      - name: 📦 Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: frontend-build
           path: frontend/build
 
-  # Job 4: Deploy Backend to EC2
+  # =========================
+  # Job 4: Deploy Backend
+  # =========================
   deploy-backend:
-    name: Deploy Backend to EC2
+    name: 🚀 Deploy Backend (EC2)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: test-backend
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      
-      - name: Deploy to EC2
+      - name: 🚀 Deploy to EC2 via SSH
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -126,52 +157,64 @@ jobs:
           script: |
             cd ~/backend
             git pull origin main
-            npm install --production
+            npm ci --production
             pm2 restart pokemon-api || pm2 start server.js --name pokemon-api
             pm2 save
 
-  # Job 5: Deploy Frontend to S3
+  # =========================
+  # Job 5: Deploy Frontend
+  # =========================
   deploy-frontend:
-    name: Deploy Frontend to S3
+    name: 🚀 Deploy Frontend (S3)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: build-frontend
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
+
     steps:
-      - name: Download build artifacts
+      - name: 📥 Download frontend build
         uses: actions/download-artifact@v3
         with:
           name: frontend-build
           path: build
-      
-      - name: Configure AWS credentials
+
+      - name: 🔐 Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      
-      - name: Deploy to S3
-        run: |
-          aws s3 sync build/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
-      
-      - name: Invalidate CloudFront cache (if applicable)
+
+      - name: ☁️ Deploy to S3
+        run: aws s3 sync build/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
+
+      - name: 🔄 Invalidate CloudFront cache
         if: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID != '' }}
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
             --paths "/*"
 
-  # Job 6: Notify deployment status
+  # =========================
+  # Job 6: Notify
+  # =========================
   notify:
-    name: Notify Deployment Status
+    name: 📣 Notify Deployment Status
     runs-on: ubuntu-latest
     needs: [deploy-backend, deploy-frontend]
     if: always() && github.ref == 'refs/heads/main'
-    
+
     steps:
-      - name: Send notification
-        run: |
-          echo "Deployment completed!"
-          echo "Backend deployment: ${{ needs.deploy-backend.result }}"
-          echo "Frontend deployment: ${{ needs.deploy-frontend.result }}"
+      - name: 💬 Comment deployment result
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `✅ **Deployment completed**
+              
+              - Backend: **${{ needs.deploy-backend.result }}**
+              - Frontend: **${{ needs.deploy-frontend.result }}**`
+            })
