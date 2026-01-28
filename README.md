@@ -24,6 +24,8 @@
 
 ### Vista Principal - Explorador de Pokémon
 ![Vista Principal](https://via.placeholder.com/800x500/F9FAFB/1A1A2E?text=Vista+Principal+-+Grid+de+Pokemon)
+<img width="1926" height="4652" alt="pokemon-frontend-sihomara s3-website us-east-2 amazonaws com_ (1)" src="https://github.com/user-attachments/assets/1f9b4e57-82b6-4e4b-9cbe-04be919354eb" />
+
 
 ### Sistema de Favoritos
 ![Favoritos](https://via.placeholder.com/800x500/F9FAFB/FF3B3B?text=Sistema+de+Favoritos)
