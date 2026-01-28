@@ -2,7 +2,6 @@
 
 <div align="center">
 
-![Pokémon Explorer Banner](https://via.placeholder.com/1200x300/1A1A2E/FF3B3B?text=Pokémon+Explorer)
 
 [![Live Demo](https://img.shields.io/badge/demo-live-success?style=for-the-badge&logo=aws)](http://pokemon-frontend-sihomara.s3-website.us-east-2.amazonaws.com/)
 [![Backend API](https://img.shields.io/badge/API-running-blue?style=for-the-badge&logo=node.js)](https://your-backend-url.com)
