@@ -1,0 +1,130 @@
+.error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FF3B3B 0%, #FF8C42 100%);
+  border-radius: 50%;
+  color: var(--white);
+  margin-bottom: var(--spacing-xl);
+  animation: shake 0.5s ease-out;
+  box-shadow: 0 8px 24px rgba(255, 59, 59, 0.3);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px) rotate(-5deg); }
+  75% { transform: translateX(10px) rotate(5deg); }
+}
+
+.error-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: var(--spacing-sm);
+}
+
+.error-text {
+  font-size: 1.1rem;
+  color: var(--medium-gray);
+  margin-bottom: var(--spacing-xl);
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.error-retry {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 0.875rem 2rem;
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--white);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-md);
+}
+
+.error-retry:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.error-retry:active {
+  transform: translateY(0);
+}
+
+.error-retry svg {
+  animation: spin 2s linear infinite;
+}
+
+.error-retry:hover svg {
+  animation-duration: 0.5s;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .error-message {
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .error-icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .error-icon svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .error-title {
+    font-size: 1.5rem;
+  }
+
+  .error-text {
+    font-size: 1rem;
+  }
+
+  .error-retry {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}

@@ -1,0 +1,220 @@
+.search-bar {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.search-input {
+  width: 100%;
+  padding: 1rem 5rem 1rem 3.5rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  border: 3px solid var(--light-gray);
+  border-radius: var(--radius-full);
+  outline: none;
+  transition: all var(--transition-base);
+  background: var(--white);
+  color: var(--dark);
+  box-shadow: var(--shadow-sm);
+}
+
+.search-input::placeholder {
+  color: var(--medium-gray);
+  font-weight: 500;
+}
+
+.search-input:hover {
+  border-color: var(--primary-blue);
+  box-shadow: var(--shadow-md);
+}
+
+.search-input:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1), var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.search-icon {
+  position: absolute;
+  left: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--medium-gray);
+  pointer-events: none;
+  transition: color var(--transition-fast);
+}
+
+.search-input:focus ~ .search-icon {
+  color: var(--primary-blue);
+}
+
+.search-clear {
+  position: absolute;
+  right: 4.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-gray);
+  border: none;
+  border-radius: 50%;
+  color: var(--medium-gray);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  opacity: 0;
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+.search-clear:hover {
+  background: var(--primary-red);
+  color: var(--white);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.search-shortcut {
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+}
+
+.search-input:focus ~ .search-shortcut {
+  opacity: 0;
+}
+
+.search-shortcut kbd {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  color: var(--medium-gray);
+  background: var(--bg-gray);
+  border: 2px solid var(--light-gray);
+  border-radius: 6px;
+  box-shadow: 0 2px 0 0 var(--light-gray);
+}
+
+/* Hide shortcut when there's text */
+.search-input:not(:placeholder-shown) ~ .search-shortcut {
+  display: none;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .search-input {
+    padding: 0.875rem 4.5rem 0.875rem 3rem;
+    font-size: 1rem;
+  }
+
+  .search-icon {
+    left: 1rem;
+    width: 20px;
+    height: 20px;
+  }
+
+  .search-clear {
+    right: 4rem;
+    width: 28px;
+    height: 28px;
+  }
+
+  .search-clear svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .search-shortcut {
+    right: 1rem;
+  }
+
+  .search-shortcut kbd {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-input {
+    padding: 0.75rem 3.5rem 0.75rem 2.75rem;
+    font-size: 0.95rem;
+  }
+
+  .search-icon {
+    left: 0.875rem;
+    width: 18px;
+    height: 18px;
+  }
+
+  .search-clear {
+    right: 3.5rem;
+    width: 26px;
+    height: 26px;
+  }
+
+  .search-clear svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .search-shortcut {
+    display: none;
+  }
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+
+.search-bar.loading .search-input {
+  background: linear-gradient(
+    90deg,
+    var(--white) 0%,
+    var(--bg-gray) 50%,
+    var(--white) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
