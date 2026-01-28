@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const NodeCache = require('node-cache');
+const favoritesManager = require('./favorites');
 require('dotenv').config();
 
 const app = express();
@@ -185,6 +186,141 @@ app.get('/api/search/:query', async (req, res) => {
     res.status(500).json({ error: 'Error searching Pokémon' });
   }
 });
+
+// ============================================
+// FAVORITOS ENDPOINTS
+// ============================================
+
+/**
+ * GET /api/favorites
+ * Obtiene la lista de pokémon favoritos del usuario
+ */
+app.get('/api/favorites', async (req, res) => {
+  try {
+    const userId = req.query.userId || 'default';
+    const favoriteIds = favoritesManager.getFavorites(userId);
+    
+    // Obtener detalles de cada pokémon favorito
+    const favoritesWithDetails = await Promise.all(
+      favoriteIds.map(async (id) => {
+        try {
+          const details = await fetchFromPokeAPI(`/pokemon/${id}`);
+          return {
+            id: details.id,
+            name: details.name,
+            types: details.types.map(t => t.type.name),
+            sprite: details.sprites.front_default,
+            height: details.height,
+            weight: details.weight
+          };
+        } catch (error) {
+          console.error(`Error fetching favorite pokemon ${id}:`, error.message);
+          return null;
+        }
+      })
+    );
+    
+    res.json({
+      count: favoriteIds.length,
+      results: favoritesWithDetails.filter(p => p !== null)
+    });
+  } catch (error) {
+    console.error('Error in /api/favorites:', error.message);
+    res.status(500).json({ error: 'Error fetching favorites' });
+  }
+});
+
+/**
+ * POST /api/favorites
+ * Agregar pokémon a favoritos
+ * Body: { pokemonId: number, userId?: string }
+ */
+app.post('/api/favorites', (req, res) => {
+  try {
+    const { pokemonId, userId = 'default' } = req.body;
+    
+    if (!pokemonId || typeof pokemonId !== 'number') {
+      return res.status(400).json({ error: 'Valid pokemonId is required' });
+    }
+    
+    const result = favoritesManager.addFavorite(userId, pokemonId);
+    res.json(result);
+  } catch (error) {
+    console.error('Error in POST /api/favorites:', error.message);
+    res.status(500).json({ error: 'Error adding favorite' });
+  }
+});
+
+/**
+ * DELETE /api/favorites/:pokemonId
+ * Eliminar pokémon de favoritos
+ * Query params: userId (opcional)
+ */
+app.delete('/api/favorites/:pokemonId', (req, res) => {
+  try {
+    const pokemonId = parseInt(req.params.pokemonId);
+    const userId = req.query.userId || 'default';
+    
+    if (!pokemonId || isNaN(pokemonId)) {
+      return res.status(400).json({ error: 'Valid pokemonId is required' });
+    }
+    
+    const result = favoritesManager.removeFavorite(userId, pokemonId);
+    res.json(result);
+  } catch (error) {
+    console.error('Error in DELETE /api/favorites:', error.message);
+    res.status(500).json({ error: 'Error removing favorite' });
+  }
+});
+
+/**
+ * POST /api/favorites/toggle
+ * Toggle favorito (agregar/eliminar)
+ * Body: { pokemonId: number, userId?: string }
+ */
+app.post('/api/favorites/toggle', (req, res) => {
+  try {
+    const { pokemonId, userId = 'default' } = req.body;
+    
+    if (!pokemonId || typeof pokemonId !== 'number') {
+      return res.status(400).json({ error: 'Valid pokemonId is required' });
+    }
+    
+    const result = favoritesManager.toggleFavorite(userId, pokemonId);
+    res.json({
+      ...result,
+      isFavorite: favoritesManager.isFavorite(userId, pokemonId)
+    });
+  } catch (error) {
+    console.error('Error in POST /api/favorites/toggle:', error.message);
+    res.status(500).json({ error: 'Error toggling favorite' });
+  }
+});
+
+/**
+ * GET /api/favorites/check/:pokemonId
+ * Verificar si un pokémon está en favoritos
+ */
+app.get('/api/favorites/check/:pokemonId', (req, res) => {
+  try {
+    const pokemonId = parseInt(req.params.pokemonId);
+    const userId = req.query.userId || 'default';
+    
+    if (!pokemonId || isNaN(pokemonId)) {
+      return res.status(400).json({ error: 'Valid pokemonId is required' });
+    }
+    
+    const isFavorite = favoritesManager.isFavorite(userId, pokemonId);
+    res.json({ pokemonId, isFavorite });
+  } catch (error) {
+    console.error('Error in GET /api/favorites/check:', error.message);
+    res.status(500).json({ error: 'Error checking favorite status' });
+  }
+});
+
+// ============================================
+// OTROS ENDPOINTS
+// ============================================
 
 /**
  * GET /api/cache/stats
