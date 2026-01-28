@@ -19,7 +19,7 @@
 ---
 
 ## 📸 Capturas de Pantalla
-
+[🚀 Revisa la web aqui](http://pokemon-frontend-sihomara.s3-website.us-east-2.amazonaws.com/) 
 <div align="center">
 
 ### Vista Principal - Explorador de Pokémon
@@ -31,7 +31,8 @@
 
 
 ### Búsqueda y Filtros
-![Búsqueda](https://via.placeholder.com/800x500/F9FAFB/4A90E2?text=Búsqueda+Inteligente)
+<img width="1481" height="1283" alt="Captura de pantalla 2026-01-28 094002" src="https://github.com/user-attachments/assets/d0c0138d-b203-48c9-9b48-5e6dd4bd8ce0" />
+
 
 </div>
 
